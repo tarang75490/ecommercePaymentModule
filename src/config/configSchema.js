@@ -16,8 +16,20 @@ const configSchema = {
                 "logLevel"
             ]
         },
-        "privateKey": {
-            "type": "string"
+        "razorPay": {
+            "type": "object",
+            "properties": {
+                "key_id": {
+                    "type": "string"
+                },
+                "key_secret": {
+                    "type": "string"
+                }
+            },
+            "required":[
+                "key_id",
+                "key_secret"
+            ]
         },
         "maxPaginationSize": {
             "type": "string"

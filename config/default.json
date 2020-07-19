@@ -6,6 +6,10 @@
     "maxPaginationSize":"20",
     "environment":"$ENVIRONMENT",
     "privateKey":"$PRIVATE_KEY",
+    "razorPay":{
+        "key_id":"$KEY_ID",
+        "key_secret":"$KEY_SECRET"
+    },
     "mongodb" : {
         "baseURL" : "$BASE_URL",
         "dbName" : "$DB_NAME",

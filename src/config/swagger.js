@@ -6,8 +6,8 @@ exports.options = {
   exposeRoute: true,
   swagger: {
     info: {
-      title: 'Product Service APIs',
-      description: 'Product related all CRUD APIs',
+      title: 'Payment Service APIs',
+      description: 'Payment related necessaries APIs',
       version: '1.0.0',
     },
     externalDocs: {
