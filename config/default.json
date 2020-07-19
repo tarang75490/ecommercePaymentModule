@@ -1,0 +1,17 @@
+{
+    "server" : {
+        "port" : "$PORT",
+        "logLevel": "info"
+    },
+    "maxPaginationSize":"20",
+    "environment":"$ENVIRONMENT",
+    "privateKey":"$PRIVATE_KEY",
+    "mongodb" : {
+        "baseURL" : "$BASE_URL",
+        "dbName" : "$DB_NAME",
+        "debug" : "false",
+        "username" : "$MONGODB_USER",
+        "password" : "$MONGODB_PASSWORD",
+        "poolSize" : 10
+    }
+}
