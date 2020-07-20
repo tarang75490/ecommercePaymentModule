@@ -74,6 +74,7 @@ const configSchema = {
         "maxPaginationSize",
         "environment",
         "mongodb",
+        "razorPay",
         "privateKey"
     ]
 }

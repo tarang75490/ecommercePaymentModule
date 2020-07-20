@@ -16,7 +16,7 @@ exports.makePayment = {
     },
     
     response: {
-        201: {
+        200: {
             description: 'Successful response',
             "type": "object",
             "properties": {
@@ -28,9 +28,7 @@ exports.makePayment = {
                     "type": "string"
                 },
                 "data": {
-                    "type": "object",
-        
-
+                    "type": "object"
                 }
             },
             "required": [

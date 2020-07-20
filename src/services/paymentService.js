@@ -12,11 +12,12 @@ const razorpay = new Razorpay({
 	key_id: config.razorPay.key_id,
 	key_secret: config.razorPay.key_secret
 })
-
+console.log(config.razorPay.key_id)
+console.log(config.razorPay.key_secret)
 
 const initiatePayment = async (fastify,initiatePaymentRequest)=>{
     try{
-    const products = await fastify.axios.get('http://localhost:3008/getProductsOfCart?customerd='+initiatePaymentRequest.customerId)
+    const products = await fastify.axios.get('http://localhost:3008/getProductsOfCart?customerId='+initiatePaymentRequest.customerId)
         console.log(products.data.data)
         let reduceInventoryRequest = {
             variantIds:[],
@@ -31,39 +32,77 @@ const initiatePayment = async (fastify,initiatePaymentRequest)=>{
         return message
     
     }catch(e){
+        console.log(e)
         return{
             error : "Payment Initialization Unsuccessful"
         }
     }
 }
 
+
 const makePayement = async (fastify,makePaymentRequest)=>{
-
-
-    
+    let maintainInventoryRequest = {
+        variantIds:[],
+        quantities:[],
+    }
+    let emailRequest = {}
+    let productRequest = []
 
     try {
         const products = await fastify.axios.get('http://localhost:3008/getProductsOfCart?customerId='+makePaymentRequest.customerId)
         console.log(products.data.data)
+       
+        products.data.data.forEach((product)=>{
+            maintainInventoryRequest.variantIds.push(product.variantId)
+            maintainInventoryRequest.quantities.push(product.quantityToBuy)
+            productRequest.push({
+                productId:product.productId,
+                productName:product.productName,
+                variantId:product.variantId,
+                quantity:product.quantityToBuy
+            })
+        })
         const payment_capture = 1
         let totalAmount = 0
         products.data.data.forEach((product)=>{
-            totalAmount += product.price * product.quantity
+            totalAmount += product.price * product.quantityToBuy
         })
 	    const currency = 'INR'
         console.log(totalAmount)
 	    const options = {
-            amount:totalAmount*100,
+            amount:totalAmount,
             currency,
             receipt: shortid.generate(),
             payment_capture
         }   
 		const response = await razorpay.orders.create(options)
-		// console.log(response)
-		return response
-	} catch (error) {
+        console.log(maintainInventoryRequest)
+        let message;
+        let emailRequest = {
+            data:productRequest,
+            subject:"Thanks For Shopping with Colossal",
+            customerId:makePaymentRequest.customerId,
+            templateName:"bill",
+            totalAmount:totalAmount
+        }
+        if(response.status === "created"){
+            // message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            // console.log(message)
+            // message = await fastify.axios.post('http://localhost:3008/updateCart',{variantIds : maintainInventoryRequest.variantIds})
+            // console.log(message)
+            message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
+
+            console.log(message)
+        }else{
+             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+        }
+        
+		return "Payment done"
+	} catch (error) {   
+        console.log(error)
+            const message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
 		return {
-            error:"payment Failed"
+            error:"payment Failed"+error.response.data.errorCause
         }
 	}
 }
