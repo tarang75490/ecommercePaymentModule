@@ -38,6 +38,57 @@ const initiatePayment = async (fastify,initiatePaymentRequest)=>{
         }
     }
 }
+const makePaymentForSingleProduct = async (fastify,makePaymentRequest)=>{
+    const payment_capture = 1
+    const currency = 'INR'
+    let maintainInventoryRequest  =null;
+    try {
+            maintainInventoryRequest = {
+            variantIds:[makePaymentRequest.variantId],
+            quantities:[1]
+        }
+        let productRequest = [{
+            variantId:makePaymentRequest.variantId,
+            quantity:1,
+            productId:makePaymentRequest.productId,
+            productName:makePaymentRequest.productName
+        }]
+        let totalAmount = makePaymentRequest.price
+	    const options = {
+            amount:totalAmount,
+            currency,
+            receipt: shortid.generate(),
+            payment_capture
+        }   
+		const response = await razorpay.orders.create(options)
+        console.log(maintainInventoryRequest)
+        let message;
+        let emailRequest = {
+            data:productRequest,
+            subject:"Thanks For Shopping with Colossal",
+            customerId:makePaymentRequest.customerId,
+            templateName:"bill",
+            totalAmount:totalAmount
+        }
+        if(response.status === "created"){
+            message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            console.log(message)
+            message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
+
+            console.log(message)
+        }else{
+             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+        }
+        
+		return "Payment done"
+	} catch (error) {   
+        console.log(error)
+            const message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+		return {
+            error:"payment Failed"+error.response.data.errorCause
+        }
+	}
+}
 
 
 const makePayement = async (fastify,makePaymentRequest)=>{
@@ -58,7 +109,8 @@ const makePayement = async (fastify,makePaymentRequest)=>{
             productRequest.push({
                 productId:product.productId,
                 productName:product.productName,
-                variantId:product.variantId,
+                variantId:product.variantId
+                ,
                 quantity:product.quantityToBuy
             })
         })
@@ -86,10 +138,10 @@ const makePayement = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            // message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
-            // console.log(message)
-            // message = await fastify.axios.post('http://localhost:3008/updateCart',{variantIds : maintainInventoryRequest.variantIds})
-            // console.log(message)
+            message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            console.log(message)
+            message = await fastify.axios.post('http://localhost:3008/updateCart',{variantIds : maintainInventoryRequest.variantIds})
+            console.log(message)
             message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
 
             console.log(message)
@@ -112,5 +164,6 @@ const makePayement = async (fastify,makePaymentRequest)=>{
 
 module.exports = {
     makePayement,
-    initiatePayment
+    initiatePayment,
+    makePaymentForSingleProduct
 }
