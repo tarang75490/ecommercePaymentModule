@@ -12,8 +12,6 @@ const razorpay = new Razorpay({
 	key_id: config.razorPay.key_id,
 	key_secret: config.razorPay.key_secret
 })
-console.log(config.razorPay.key_id)
-console.log(config.razorPay.key_secret)
 
 const initiatePayment = async (fastify,initiatePaymentRequest)=>{
     try{
