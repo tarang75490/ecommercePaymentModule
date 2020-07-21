@@ -26,7 +26,7 @@ const initiatePayment = async (fastify,initiatePaymentRequest)=>{
             reduceInventoryRequest.quantities.push(product.quantityToBuy)
         })
         console.log(reduceInventoryRequest)
-        const message = await fastify.axios.post('http://localhost:3000/reduceInventory',reduceInventoryRequest)
+        const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/reduceInventory',reduceInventoryRequest)
         return message
     
     }catch(e){
@@ -69,19 +69,19 @@ const makePaymentForSingleProduct = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
-            message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
+            message = await fastify.axios.post('https://colossalnotify-service.herokuapp.com/sentMessagebyEmail',emailRequest)
 
             console.log(message)
         }else{
-             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+             message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
         }
         
 		return "Payment done"
 	} catch (error) {   
         console.log(error)
-            const message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+            const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
 		return {
             error:"payment Failed"+error.response.data.errorCause
         }
