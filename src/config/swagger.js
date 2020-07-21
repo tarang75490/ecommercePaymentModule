@@ -15,7 +15,7 @@ exports.options = {
       description: 'Find more info here'
     },
     // host: 'localhost:'+keys.server.port,  ---- > Local host
-    host:"colossalpayment.heroku.com",
+    host:"colossalpayment.herokuapp.com",
     schemes: ['https'],
     consumes: ['application/json'],
     produces: ['application/json']
