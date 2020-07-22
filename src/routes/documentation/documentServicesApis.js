@@ -103,7 +103,7 @@ exports.initiatePayment = {
     },
     
     response: {
-        201: {
+        200: {
             description: 'Successful response',
             "type": "object",
             "properties": {

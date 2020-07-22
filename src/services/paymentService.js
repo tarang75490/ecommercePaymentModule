@@ -15,7 +15,8 @@ const razorpay = new Razorpay({
 
 const initiatePayment = async (fastify,initiatePaymentRequest)=>{
     try{
-    const products = await fastify.axios.get('http://localhost:3008/getProductsOfCart?customerId='+initiatePaymentRequest.customerId)
+        console.log(initiatePaymentRequest)
+        const products = await fastify.axios.get('http://localhost:3001/getProductsOfCart?customerId='+initiatePaymentRequest.customerId)
         console.log(products.data.data)
         let reduceInventoryRequest = {
             variantIds:[],
@@ -26,11 +27,11 @@ const initiatePayment = async (fastify,initiatePaymentRequest)=>{
             reduceInventoryRequest.quantities.push(product.quantityToBuy)
         })
         console.log(reduceInventoryRequest)
-        const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/reduceInventory',reduceInventoryRequest)
+        const message = await fastify.axios.post('http://localhost:3000/reduceInventory',reduceInventoryRequest)
         return message
     
     }catch(e){
-        console.log(e)
+        // console.log(e)
         return{
             error : "Payment Initialization Unsuccessful"
         }
@@ -69,19 +70,19 @@ const makePaymentForSingleProduct = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
-            message = await fastify.axios.post('https://colossalnotify-service.herokuapp.com/sentMessagebyEmail',emailRequest)
+            message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
 
             console.log(message)
         }else{
-             message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
+             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
         }
         
 		return "Payment done"
 	} catch (error) {   
         console.log(error)
-            const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
+            const message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
 		return {
             error:"payment Failed"+error.response.data.errorCause
         }
@@ -98,7 +99,7 @@ const makePayement = async (fastify,makePaymentRequest)=>{
     let productRequest = []
 
     try {
-        const products = await fastify.axios.get('http://localhost:3008/getProductsOfCart?customerId='+makePaymentRequest.customerId)
+        const products = await fastify.axios.get('http://localhost:3001/getProductsOfCart?customerId='+makePaymentRequest.customerId)
         console.log(products.data.data)
        
         products.data.data.forEach((product)=>{
@@ -138,9 +139,15 @@ const makePayement = async (fastify,makePaymentRequest)=>{
         if(response.status === "created"){
             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
-            message = await fastify.axios.post('http://localhost:3008/updateCart',{variantIds : maintainInventoryRequest.variantIds})
+            message = await fastify.axios.post('http://localhost:3001/updateCart',{variantIds : maintainInventoryRequest.variantIds})
             console.log(message)
             message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
+            await fastify.axios.post('http://localhost:3006/saveCustomerHistory',{
+                                                                    customerId : makePaymentRequest.customerId,
+                                                                    transactionDetails:products.data.data,
+                                                                    totalAmount:totalAmount
+                                                                    
+                                                                        })
 
             console.log(message)
         }else{

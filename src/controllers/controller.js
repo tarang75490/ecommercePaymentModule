@@ -49,7 +49,7 @@ exports.initiatePayment= async (req, res) => {
             res.code(400)
                 throw new HttpError('faliure', 22005,response.error)
         }
-        return res.status(201).send({
+        return res.status(200).send({
             status: 'success',
             data: response,
             message:"Payment Initiated Successfully"

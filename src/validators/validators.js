@@ -12,6 +12,7 @@ exports.validateMakePaymentRequest = function (req, res, done) {
 
 
 exports.validateInitiatePaymentRequest = function (req, res, done) {
+    console.log(req.query)
     if (!req.query.customerId) {
         res.code(400)
         done(new HttpError('faliure', 20001, 'CustomerId is missing'))
