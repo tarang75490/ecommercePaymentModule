@@ -101,7 +101,7 @@ fastify.setErrorHandler(function (error, request, reply) {
 appconfig = config.server
 const host = '0.0.0.0';
 const PORT = process.env.PORT ||5000
-fastify.listen(PORT, function (err, address) {
+fastify.listen(PORT,host, function (err, address) {
   if (err) {  
     fastify.log.error(err)
     process.exit(1)

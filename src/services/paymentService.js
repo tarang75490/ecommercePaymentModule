@@ -16,7 +16,7 @@ const razorpay = new Razorpay({
 const initiatePayment = async (fastify,initiatePaymentRequest)=>{
     try{
         console.log(initiatePaymentRequest)
-        const products = await fastify.axios.get('http://localhost:3001/getProductsOfCart?customerId='+initiatePaymentRequest.customerId)
+        const products = await fastify.axios.get('https://colossalcart.herokuapp.com/getProductsOfCart?customerId='+initiatePaymentRequest.customerId)
         console.log(products.data.data)
         let reduceInventoryRequest = {
             variantIds:[],
@@ -27,7 +27,7 @@ const initiatePayment = async (fastify,initiatePaymentRequest)=>{
             reduceInventoryRequest.quantities.push(product.quantityToBuy)
         })
         console.log(reduceInventoryRequest)
-        const message = await fastify.axios.post('http://localhost:3010/reduceInventory',reduceInventoryRequest)
+        const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/reduceInventory',reduceInventoryRequest)
         console.log(message)
         return message
     
@@ -71,19 +71,19 @@ const makePaymentForSingleProduct = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
-            message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
+            message = await fastify.axios.post('https://colossalnotify-service.herokuapp.com/sentMessagebyEmail',emailRequest)
 
             console.log(message)
         }else{
-             message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"error"})
+             message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
         }
         
-		return "Payment done"
+		return "Payment done !! Will Be Deliverd Soon"
 	} catch (error) {   
         console.log(error)
-            const message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"error"})
+            const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
 		return {
             error:"payment Failed"+error.response.data.errorCause
         }
@@ -100,7 +100,7 @@ const makePayement = async (fastify,makePaymentRequest)=>{
     let productRequest = []
 
     try {
-        const products = await fastify.axios.get('http://localhost:3001/getProductsOfCart?customerId='+makePaymentRequest.customerId)
+        const products = await fastify.axios.get('https://colossalcart.herokuapp.com/getProductsOfCart?customerId='+makePaymentRequest.customerId)
         console.log(products.data.data)
        
         products.data.data.forEach((product)=>{
@@ -138,12 +138,12 @@ const makePayement = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
-            message = await fastify.axios.post('http://localhost:3001/updateCart',{variantIds : maintainInventoryRequest.variantIds})
+            message = await fastify.axios.post('https://colossalcart.herokuapp.com/updateCart',{variantIds : maintainInventoryRequest.variantIds})
             console.log(message)
-            message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
-            await fastify.axios.post('http://localhost:3006/saveCustomerHistory',{
+            message = await fastify.axios.post('https://colossalnotify-service.herokuapp.com/sentMessagebyEmail',emailRequest)
+            await fastify.axios.post('https://colossalcustomer.herokuapp.com/saveCustomerHistory',{
                                                                     customerId : makePaymentRequest.customerId,
                                                                     transactionDetails:products.data.data,
                                                                     totalAmount:totalAmount
@@ -152,13 +152,13 @@ const makePayement = async (fastify,makePaymentRequest)=>{
 
             console.log(message)
         }else{
-             message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"error"})
+             message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
         }
         
-		return "Payment done"
+		return "Payment done ! Product Will Be Delivered Soon"
 	} catch (error) {   
         console.log(error)
-            const message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+            const message = await fastify.axios.post('https://colossalproduct.herokuapp.com/maintainInventory',{...maintainInventoryRequest,message:"error"})
 		return {
             error:"payment Failed"+error.response.data.errorCause
         }
