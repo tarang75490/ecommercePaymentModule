@@ -6,14 +6,14 @@ const documentation = require('./documentation/documentServicesApis')
 
 const routes = [
     {
-        method: "POST",
+        method: "GET",
         url: "/makePayment",
         handler: controllers.makePayment,
         schema: documentation.makePayment,
         preValidation: validators.validateMakePaymentRequest
     },
     {
-        method: "POST",
+        method: "GET",
         url: "/initialPayment",
         handler: controllers.initiatePayment,
         schema: documentation.initiatePayment,

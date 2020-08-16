@@ -55,6 +55,11 @@ fastify.register(require('fastify-axios'))
 // Import Swagger Options
 const swagger = require('./config/swagger')
 
+fastify.register(require('fastify-cors'), {
+  origin: '*',
+});
+
+
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 

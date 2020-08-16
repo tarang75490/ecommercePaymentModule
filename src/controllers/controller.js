@@ -8,7 +8,12 @@ exports.makePayment= async (req, res) => {
         let response = await service.makePayement(req.fastify, req.query)
         console.log(response)
         if(response.error){
-            res.code(400)
+            return res.status(200).send({
+                status: 'failure',
+                data: response,
+                message: response.error
+            })
+            res.code(200)
                 throw new HttpError('faliure', 22005,response.error)
         }
         return res.status(200).send({
@@ -27,8 +32,13 @@ exports.makePaymentForSingleProduct= async (req, res) => {
         let response = await service.makePaymentForSingleProduct(req.fastify, req.body)
         console.log(response)
         if(response.error){
-            res.code(400)
-                throw new HttpError('faliure', 22005,response.error)
+            return res.status(200).send({
+                status: 'failure',
+                data: response,
+                message: response.error
+            })
+            res.code(200)
+            throw new HttpError('faliure', 22005,response.error)
         }
         return res.status(200).send({
             status: 'success',
@@ -44,9 +54,14 @@ exports.makePaymentForSingleProduct= async (req, res) => {
 exports.initiatePayment= async (req, res) => {
     try {
         let response = await service.initiatePayment(req.fastify, req.query)
-        // console.log(response)
+        console.log(response)
         if(response.error){
-            res.code(400)
+            return res.status(200).send({
+                status: 'failure',
+                data: response,
+                message: response.error
+            })
+            res.code(200)
                 throw new HttpError('faliure', 22005,response.error)
         }
         return res.status(200).send({

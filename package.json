@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/app.js",
-    "start":"node src/app.js"
+    "start": "node src/app.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "expandenv": "^1.0.0",
     "fastify": "^3.1.1",
     "fastify-axios": "^1.1.2",
+    "fastify-cors": "^4.1.0",
     "fastify-swagger": "^3.1.2",
     "mongoose": "^5.9.25",
     "razorpay": "^2.0.6",

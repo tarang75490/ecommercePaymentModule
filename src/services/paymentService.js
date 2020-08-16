@@ -27,7 +27,8 @@ const initiatePayment = async (fastify,initiatePaymentRequest)=>{
             reduceInventoryRequest.quantities.push(product.quantityToBuy)
         })
         console.log(reduceInventoryRequest)
-        const message = await fastify.axios.post('http://localhost:3000/reduceInventory',reduceInventoryRequest)
+        const message = await fastify.axios.post('http://localhost:3010/reduceInventory',reduceInventoryRequest)
+        console.log(message)
         return message
     
     }catch(e){
@@ -70,19 +71,19 @@ const makePaymentForSingleProduct = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
             message = await fastify.axios.post('http://localhost:3007/sentMessagebyEmail',emailRequest)
 
             console.log(message)
         }else{
-             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+             message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"error"})
         }
         
 		return "Payment done"
 	} catch (error) {   
         console.log(error)
-            const message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+            const message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"error"})
 		return {
             error:"payment Failed"+error.response.data.errorCause
         }
@@ -127,7 +128,7 @@ const makePayement = async (fastify,makePaymentRequest)=>{
             payment_capture
         }   
 		const response = await razorpay.orders.create(options)
-        console.log(maintainInventoryRequest)
+        // console.log(maintainInventoryRequest)
         let message;
         let emailRequest = {
             data:productRequest,
@@ -137,7 +138,7 @@ const makePayement = async (fastify,makePaymentRequest)=>{
             totalAmount:totalAmount
         }
         if(response.status === "created"){
-            message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"success"})
+            message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"success"})
             console.log(message)
             message = await fastify.axios.post('http://localhost:3001/updateCart',{variantIds : maintainInventoryRequest.variantIds})
             console.log(message)
@@ -151,7 +152,7 @@ const makePayement = async (fastify,makePaymentRequest)=>{
 
             console.log(message)
         }else{
-             message = await fastify.axios.post('http://localhost:3000/maintainInventory',{...maintainInventoryRequest,message:"error"})
+             message = await fastify.axios.post('http://localhost:3010/maintainInventory',{...maintainInventoryRequest,message:"error"})
         }
         
 		return "Payment done"
